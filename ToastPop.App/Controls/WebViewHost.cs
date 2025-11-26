@@ -181,6 +181,7 @@ public class WebViewHost : ContentControl
         else
         {
             _pendingUrl = url;
+
         }
     }
 }
