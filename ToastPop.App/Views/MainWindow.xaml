@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:ToastPop.App.ViewModels"
-    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="ToastPop"
     Width="1200"
     Height="800"
@@ -23,7 +22,6 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <!--  Tab Item Style  -->
         <Style x:Key="BrowserTabItemStyle" TargetType="TabItem">
             <Setter Property="Padding" Value="12,6" />
             <Setter Property="Background" Value="{DynamicResource TabBackgroundBrush}" />
@@ -45,24 +43,18 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-
-                                <!--  Favicon  -->
                                 <Image
                                     Grid.Column="0"
                                     Width="16"
                                     Height="16"
                                     Margin="0,0,8,0"
                                     Source="{Binding Favicon}" />
-
-                                <!--  Title  -->
                                 <TextBlock
                                     Grid.Column="1"
                                     MaxWidth="150"
                                     VerticalAlignment="Center"
                                     Text="{Binding Title}"
                                     TextTrimming="CharacterEllipsis" />
-
-                                <!--  Close Button  -->
                                 <Button
                                     Grid.Column="2"
                                     Width="18"
@@ -95,13 +87,15 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <!-- 탭 헤더만 -->
             <RowDefinition Height="*" />
+            <!-- 메인 콘텐츠 (WebView) -->
             <RowDefinition Height="Auto" />
+            <!-- 상태바 -->
         </Grid.RowDefinitions>
 
-        <!--  Tab Header with New Tab Button  -->
+        <!-- 탭 헤더 영역 -->
         <DockPanel Grid.Row="0" Background="{DynamicResource HeaderBackgroundBrush}">
-            <!--  New Tab Button  -->
             <Button
                 Width="32"
                 Height="32"
@@ -115,7 +109,7 @@
                 FontSize="16"
                 ToolTip="새 탭 열기" />
 
-            <!--  Tab Control  -->
+            <!-- 탭 헤더만 표시 (콘텐츠는 아래 별도 영역) -->
             <TabControl
                 x:Name="BrowserTabs"
                 Background="Transparent"
@@ -123,125 +117,112 @@
                 ItemContainerStyle="{StaticResource BrowserTabItemStyle}"
                 ItemsSource="{Binding Tabs}"
                 SelectedItem="{Binding SelectedTab}">
+                <!-- 콘텐츠 템플릿을 빈 것으로 설정하여 탭 헤더만 표시 -->
                 <TabControl.ContentTemplate>
                     <DataTemplate>
-                        <Grid>
-                            <!--  Address Bar  -->
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <!--  Navigation Bar  -->
-                            <Border
-                                Grid.Row="0"
-                                Padding="8"
-                                Background="{DynamicResource NavigationBarBackgroundBrush}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <!--  Back  -->
-                                    <Button
-                                        Grid.Column="0"
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,4,0"
-                                        Command="{Binding GoBackCommand}"
-                                        Content="◀"
-                                        IsEnabled="{Binding CanGoBack}"
-                                        ToolTip="뒤로" />
-
-                                    <!--  Forward  -->
-                                    <Button
-                                        Grid.Column="1"
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,4,0"
-                                        Command="{Binding GoForwardCommand}"
-                                        Content="▶"
-                                        IsEnabled="{Binding CanGoForward}"
-                                        ToolTip="앞으로" />
-
-                                    <!--  Refresh  -->
-                                    <Button
-                                        Grid.Column="2"
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,4,0"
-                                        Command="{Binding RefreshCommand}"
-                                        Content="⟳"
-                                        ToolTip="새로고침" />
-
-                                    <!--  Home  -->
-                                    <Button
-                                        Grid.Column="3"
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,8,0"
-                                        Command="{Binding GoHomeCommand}"
-                                        Content="🏠"
-                                        ToolTip="홈" />
-
-                                    <!--  Address Box  -->
-                                    <Border
-                                        Grid.Column="4"
-                                        Background="{DynamicResource TextBoxBackgroundBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="4">
-                                        <TextBox
-                                            Padding="8,6"
-                                            VerticalContentAlignment="Center"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Text="{Binding CurrentUrl, UpdateSourceTrigger=PropertyChanged}">
-                                            <TextBox.InputBindings>
-                                                <KeyBinding
-                                                    Key="Return"
-                                                    Command="{Binding NavigateCommand}"
-                                                    CommandParameter="{Binding CurrentUrl}" />
-                                            </TextBox.InputBindings>
-                                        </TextBox>
-                                    </Border>
-
-                                    <!--  Go Button  -->
-                                    <Button
-                                        Grid.Column="5"
-                                        Width="32"
-                                        Height="32"
-                                        Margin="8,0,0,0"
-                                        Command="{Binding NavigateCommand}"
-                                        CommandParameter="{Binding CurrentUrl}"
-                                        Content="1→1"
-                                        ToolTip="이동" />
-                                </Grid>
-                            </Border>
-
-                            <!--  WebView2 Browser  -->
-                            <controls:WebViewHost
-                                x:Name="WebViewHost"
-                                Grid.Row="1"
-                                Background="Red"
-                                TabViewModel="{Binding}" />
-                        </Grid>
+                        <Border Height="0" />
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
         </DockPanel>
 
-        <!--  Main Content Area (Hidden Browser for background tasks)  -->
-        <Grid Grid.Row="1" Visibility="Collapsed">
-            <wv2:WebView2 x:Name="BackgroundWebView" />
+        <!-- 메인 콘텐츠 영역 (선택된 탭의 WebView) -->
+        <Grid Grid.Row="1">
+            <!-- 네비게이션 바 -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border
+                Grid.Row="0"
+                Padding="8"
+                Background="{DynamicResource NavigationBarBackgroundBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        Grid.Column="0"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,4,0"
+                        Command="{Binding SelectedTab.GoBackCommand}"
+                        Content="◀"
+                        IsEnabled="{Binding SelectedTab.CanGoBack}"
+                        ToolTip="뒤로" />
+                    <Button
+                        Grid.Column="1"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,4,0"
+                        Command="{Binding SelectedTab.GoForwardCommand}"
+                        Content="▶"
+                        IsEnabled="{Binding SelectedTab.CanGoForward}"
+                        ToolTip="앞으로" />
+                    <Button
+                        Grid.Column="2"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,4,0"
+                        Command="{Binding SelectedTab.RefreshCommand}"
+                        Content="⟳"
+                        ToolTip="새로고침" />
+                    <Button
+                        Grid.Column="3"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,8,0"
+                        Command="{Binding SelectedTab.GoHomeCommand}"
+                        Content="🏠"
+                        ToolTip="홈" />
+
+                    <Border
+                        Grid.Column="4"
+                        Background="{DynamicResource TextBoxBackgroundBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                        <TextBox
+                            Padding="8,6"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Text="{Binding SelectedTab.CurrentUrl, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding
+                                    Key="Return"
+                                    Command="{Binding SelectedTab.NavigateCommand}"
+                                    CommandParameter="{Binding SelectedTab.CurrentUrl}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </Border>
+
+                    <Button
+                        Grid.Column="5"
+                        Width="32"
+                        Height="32"
+                        Margin="8,0,0,0"
+                        Command="{Binding SelectedTab.NavigateCommand}"
+                        CommandParameter="{Binding SelectedTab.CurrentUrl}"
+                        Content="→"
+                        ToolTip="이동" />
+                </Grid>
+            </Border>
+
+            <!-- WebView 영역 -->
+            <controls:WebViewHost
+                Grid.Row="1"
+                TabViewModel="{Binding SelectedTab}" />
         </Grid>
 
-        <!--  Status Bar  -->
+        <!-- 상태바 -->
         <Border
             Grid.Row="2"
             Padding="8,4"

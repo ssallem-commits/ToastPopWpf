@@ -155,19 +155,24 @@ public class WebViewHost : ContentControl
 
     private static void OnTabViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is WebViewHost host && e.NewValue is BrowserTabViewModel vm)
+        if (d is WebViewHost host)
         {
-            if (host._isInitialized && host._webView != null)
+            if (e.NewValue is BrowserTabViewModel newVm)
             {
-                vm.SetWebView(host._webView);
-                if (!string.IsNullOrEmpty(vm.CurrentUrl))
+                if (host._isInitialized && host._webView != null)
                 {
-                    host._webView.CoreWebView2?.Navigate(vm.CurrentUrl);
+                    newVm.SetWebView(host._webView);
+
+                    // 새 탭으로 전환 시 해당 URL로 이동
+                    if (!string.IsNullOrEmpty(newVm.CurrentUrl) && newVm.CurrentUrl != "about:blank")
+                    {
+                        host._webView.CoreWebView2?.Navigate(newVm.CurrentUrl);
+                    }
                 }
-            }
-            else
-            {
-                host._pendingUrl = vm.CurrentUrl;
+                else
+                {
+                    host._pendingUrl = newVm.CurrentUrl;
+                }
             }
         }
     }
